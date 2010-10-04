@@ -8,23 +8,24 @@ import os
 from xdg.BaseDirectory import xdg_config_home
 from ConfigParser import SafeConfigParser
 
+
 class Configuration():
     """Configuration file"""
-    
+
     def __init__(self, options=None):
         self.debug = False
         if options:
             self.debug = options.debug
-            
+
         config_dir = xdg_config_home
-        self.conf_dir = os.path.join(config_dir,self.project_name)
+        self.conf_dir = os.path.join(config_dir, self.project_name)
         self.config = SafeConfigParser()
         self.conf_file = os.path.join(self.conf_dir, '%s.conf' % self.project_name)
-        
+
         # variable definition here
         for (option, value) in self.available_options.items():
             setattr(self, option, value)
-        
+
         if not os.path.isfile(self.conf_file):
             if self.debug:
                 print "Configuration file not found, creating it"
@@ -36,7 +37,7 @@ class Configuration():
                 attr = getattr(options, option, False)
                 if attr:
                     setattr(self, option, attr)
-        
+
     def write(self):
         "Write settings in the configuration file"
         if self.debug:
@@ -48,7 +49,7 @@ class Configuration():
         if not self.config.has_section('general'):
             self.config.add_section('general')
         # setting Feed URL
-        for option in self.available_options:     
+        for option in self.available_options:
             self.config.set('general', option, getattr(self, option))
 
         # finally writing the file.

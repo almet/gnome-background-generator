@@ -59,4 +59,4 @@ class XmlBackgroundBuilder():
 
             background.appendChild(transition)
 
-        print doc.toxml()
+        print doc.toprettyxml()

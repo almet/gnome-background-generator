@@ -98,7 +98,7 @@ if __name__ == "__main__":
         Default value is 900 (15mn)""")
 
     parser.add_argument('-s', '--set-background', dest='set_background', 
-        action='store_true', help="""'''try to set the background using
+        action='store_true', help="""try to set the background using
         gnome-appearance-properties""")
 
     parser.add_argument('-b', '--debug', dest='debug', action='store_true')

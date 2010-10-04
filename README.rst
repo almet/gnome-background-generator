@@ -5,30 +5,34 @@ Gnome background can use XML files to make an animated background.
 This little script allows you to generate automaticaly your own XML background
 changer file, easily, using the command line.
 
-To generate the XML file, use:
+To generate the XML file, use `gnome-background-generator`::
 
-Options
-========
+    usage: gnome-background-generator [-h] [-p PATH] [-o OUTPUT]
+                                  [-t TRANSITION_TIME] [-d DISPLAY_TIME] [-s]
+                                  [-b]
 
-Here is the --help output::
+    A simple command line tool to generate an XML file to use for gnome
+    wallpapers, to have dynamic walls
 
-    $ python genbackground --help
-    -h, --help            show this help message and exit
-    -d, --debug           display debug messages on the standard output
-    -p PATH, --path=PATH  set the path to look for pictures.
-    -t TRANSITION_TIME, --transition_time=TRANSITION_TIME
-                        set the transition time, overwriting the configuration
-                        value
-    --display-time=DISPLAY_TIME
-                        set the display time for a picture, overwriting the
-                            configuration value
+    optional arguments:
+      -h, --help            show this help message and exit
+      -p PATH, --path PATH  Path to look for the pictures. If no output is
+                            specified, will be used too for outputing the dynamic-
+                            wallpaper.xml file. Default value is the current
+                            directory (.)
+      -o OUTPUT, --output OUTPUT
+                            Output filename. If no filename is specified, a
+                            dynamic-wallpaper.xml file will be generated in the
+                            path containing the pictures. You can also use "-" to
+                            display the xml in the stdout.
+      -t TRANSITION_TIME, --transition-time TRANSITION_TIME
+                            Time (in seconds) transitions must last (default value
+                            is 2 seconds)
+      -d DISPLAY_TIME, --display-time DISPLAY_TIME
+                            Time (in seconds) a picture must be displayed. Default
+                            value is 900 (15mn)
+      -s, --set-background  '''try to set the background using gnome-appearance-
+                            properties
+      -b, --debug
 
-Exemple
-========
-
-Here is an exemple to creates a XML file from a path containing all wallpapers
-you want::
-
-    python genbackground.py --path /path/to/wallpapers/directory/ > dynamicwallpapers.xml
-    
 And that's it !

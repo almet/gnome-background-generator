@@ -114,7 +114,8 @@ if __name__ == "__main__":
         print 'Error: no pictures in the %s folder (looking for %s)' % (
             args.path, ', '.join(_SUPPORTED_FILES))
     else:
-        xml = generator.build_xml(pictures, args.transition_time, args.display_time)
+        xml = generator.build_xml(pictures, args.display_time, 
+                                  args.transition_time)
 
         if args.output == '-':
             print xml

@@ -52,11 +52,8 @@ class Main(object):
 
     def generate_xml(self):
         "Generate the XML, according to preferences"
-        builder = XmlBackgroundBuilder(
-            self.configuration.transition_time,
-            self.configuration.display_time,
-        )
-
+        builder = XmlBackgroundBuilder(self.configuration.transition_time, 
+                                       self.configuration.display_time)
         builder.build_xml(self.get_pictures_list(
             self.options.path, self.configuration.authorized_extensions))
 
@@ -67,7 +64,7 @@ class Main(object):
         pictures_list = []
         for filename in os.listdir(path):
             if filename.split('.')[-1] in authorized_extensions:
-                pictures_list.append('%s%s' % (path, filename))
+                pictures_list.append(os.path.join(path, filename))
         return pictures_list
 
 if __name__ == "__main__":

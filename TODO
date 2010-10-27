@@ -1,1 +1,2 @@
-* Make a real packaging for it
+* Add a start date
+* rewrite the XML output with jinja2

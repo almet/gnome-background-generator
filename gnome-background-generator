@@ -9,6 +9,7 @@ wallpapers"""
 import os
 from xml.dom.minidom import Document
 import argparse
+import datetime
 
 _SUPPORTED_FILES = ('jpg', 'jpeg', 'png')
 
@@ -34,6 +35,28 @@ class DynamicWallpaperGenerator(object):
         doc = Document()
         background = doc.createElement('background')
         doc.appendChild(background)
+
+        starttime = doc.createElement('starttime')
+        now = datetime.datetime.now()
+        year = doc.createElement('year')
+        year.appendChild(doc.createTextNode(now.year))
+        starttime.appendChild(year)
+        month = doc.createElement('month')
+        month.appendChild(doc.createTextNode(now.month))
+        starttime.appendChild(month)
+        day = doc.createElement('day')
+        day.appendChild(doc.createTextNode(now.day))
+        starttime.appendChild(day)
+        hour = doc.createElement('hour')
+        hour.appendChild(doc.createTextNode(now.hour))
+        starttime.appendChild(hour)
+        minute = doc.createElement('minute')
+        minute.appendChild(doc.createTextNode(now.minute))
+        starttime.appendChild(minute)
+        second = doc.createElement('second')
+        second.appendChild(doc.createTextNode(now.second))
+        starttime.appendChild(second)
+        background.appendChild(starttime)
 
         for pic in pictures_list:
             try:

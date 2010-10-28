@@ -6,7 +6,7 @@ if sys.version_info < (2,7):
 
 setup(
     name = "gnome-background-generator",
-    version = '1.0.3',
+    version = '1.0.4',
     url = 'http://github.com/ametaireau/gnome-background-generator/',
     author = 'Alexis Metaireau',
     author_email = 'alexis@notmyidea.org',
@@ -14,7 +14,7 @@ setup(
                   dynamic gnome wallpapers""",
     long_description=open('README.rst').read(),
     requires = requires, 
-    scripts = ['gnome-background-generator'],
+    scripts = ['gnome-background-generator', 'gnome-wallpaper-select'],
     classifiers = ['Development Status :: 5 - Production/Stable',
                    'Environment :: Console',
                    'License :: OSI Approved :: GNU Affero General Public License v3',

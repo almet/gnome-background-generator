@@ -35,4 +35,9 @@ To generate the XML file, use `gnome-background-generator`::
                             properties
       -b, --debug
 
-And that's it !
+There is also another command you can use to change your background to a random
+file from a known directory::
+
+    $ gnome-wallpaper-select /path/to/walls 
+
+This second one is useful if combined with a cronjob :)

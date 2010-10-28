@@ -13,10 +13,11 @@ def choose_background(path):
         choice = random.randint(0,len(files)-1)
         wall = os.path.join(os.path.abspath(path),files[choice])
         os.system('gconftool-2 --set /desktop/gnome/background/picture_filename --type string "%s"' % wall)
+        return wall
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="""Choose an arbitrary file to set on the background""")
 
     parser.add_argument(dest='path', help='path you want to choose the image from')
     args = parser.parse_args()
-    choose_background(args.path)
+    print 'selected %s' % choose_background(args.path)

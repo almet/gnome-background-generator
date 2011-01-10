@@ -8,7 +8,7 @@ def choose_background(path):
     files = []
     for root, dirs, temp_files in os.walk(path, followlinks=True):
         files.extend([os.sep.join((root, f)) for f in temp_files
-                      if f[-3:].lower() in ('jpg', 'png', 'jpeg')])
+                      if f[-3:].lower() in ('jpg', 'png', 'jpeg', 'gif')])
     if len(files) > 0:
         choice = random.randint(0,len(files)-1)
         wall = os.path.join(os.path.abspath(path),files[choice])

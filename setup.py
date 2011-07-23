@@ -3,6 +3,8 @@ import sys
 
 if sys.version_info < (2,7):
     requires = ['argparse', ]
+else:
+    requires = []
 
 setup(
     name = "gnome-background-generator",

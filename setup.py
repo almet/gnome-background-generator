@@ -8,7 +8,7 @@ else:
 
 setup(
     name = "gnome-background-generator",
-    version = '1.1.1',
+    version = '1.1.2',
     url = 'http://github.com/ametaireau/gnome-background-generator/',
     author = 'Alexis Metaireau',
     author_email = 'alexis@notmyidea.org',

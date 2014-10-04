@@ -1,47 +1,59 @@
-Gnome dynamic background generator
-###################################
+Dynamic background generator
+############################
 
 This package propose two ways to dynamically change your desktop automatically.
-One is by generating a XML file, that can be used by the gnome system, and the
-other one is a little script you can run to randomly select a picture from a
-path.
+One is by generating a XML file, that can be used by any GNOME desktop
+compatible system (such as GNOME 2 and 3, Unity, MATE and Cinnamon), and the other
+one is a little script you can run to randomly select a picture from a path.
 
 Using XML files
 ===============
 
-Gnome background can use XML files to make an animated background. 
-This little script allows you to generate automaticaly your own XML background
+GNOME background compatible desktop environment can use XML files to make an
+animated background. 
+This little script allows you to automatically generate your own XML background
 changer file, easily, using the command line.
 
 To generate the XML file, use `gnome-background-generator`::
 
-    usage: gnome-background-generator [-h] [-p PATH] [-o OUTPUT]
-                                  [-t TRANSITION_TIME] [-d DISPLAY_TIME] [-s]
-                                  [-b]
+    usage: gnome-background-generator [-h] [-v] [-o OUTPUT]
+                                  [-r] [-t TRANSITION_TIME] [-d DISPLAY_TIME]
+                                  [-R] [-f] [directory [directory ...]]
 
     A simple command line tool to generate an XML file to use for gnome
     wallpapers, to have dynamic walls
 
+    positional arguments:
+      directory             Directory path that should be searched for image files
+
     optional arguments:
       -h, --help            show this help message and exit
-      -p PATH, --path PATH  Path to look for the pictures. If no output is
-                            specified, will be used too for outputing the dynamic-
-                            wallpaper.xml file. Default value is the current
-                            directory (.)
+      -r, --randomize       Randomly shuffle scanned images
+      -R, --recursive       Recursivly scan the given directories
+      -f, --follow-symlinks
+                            Follow symbolic links when scanning directories
+                            recursivly (implies --recursive)
       -o OUTPUT, --output OUTPUT
                             Output filename. If no filename is specified, a
                             dynamic-wallpaper.xml file will be generated in the
                             path containing the pictures. You can also use "-" to
-                            display the xml in the stdout.
+                            display the xml in the stdout
       -t TRANSITION_TIME, --transition-time TRANSITION_TIME
-                            Time (in seconds) transitions must last (default value
-                            is 2 seconds)
+                            Time (in seconds) transitions must last [Default: 2]
       -d DISPLAY_TIME, --display-time DISPLAY_TIME
-                            Time (in seconds) a picture must be displayed. Default
-                            value is 900 (15mn)
-      -s, --set-background  '''try to set the background using gnome-appearance-
-                            properties
-      -b, --debug
+                            Time (in seconds) a picture must be displayed
+                            [Default: 900 (15min)]
+      -v, --debug
+
+Examples
+--------
+
+1. Generate a file named `dynamic-background.xml` from all images in the current directory:
+   ``gnome-background-generator``
+2. Generate a file named `background.xml` in the current directory using all images in
+   the directories "foo" and "bar" and all their subdirectories (even symlinked ones)
+   in random order with a 5 second transition and a 15 second display time:
+   ``gnome-background-generator -o background.xml -r -t 5 -d 15 -R -f foo bar``
 
 Changing your desktop randomly
 ==============================

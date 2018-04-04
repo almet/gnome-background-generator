@@ -6,30 +6,65 @@
 """A simple utility command line to generate a XML file for dynamic gnome
 wallpapers"""
 
-import os
 from xml.dom.minidom import Document
 import argparse
 import datetime
+import logging
+import mimetypes
+import os
+import random
+import subprocess
+import sys
 
-_SUPPORTED_FILES = ('jpg', 'jpeg', 'png')
-
+# New features:
+#  * Recursive scanning (parameters -l and -R)
+#  * Random shuffeling of result (-r)
+#  * Support more image file formats (by using mimetypes module)
+#  * Support more than one directory
+#  * Python 3 support (backwards compatible with Python 2)
 
 class DynamicWallpaperGenerator(object):
+    def __init__(self, debug=False):
+        self.images = []
+        
+        # Setup logging
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter("%(name)s [%(levelname)s]: %(message)s"))
+        self.logger = logging.getLogger("wallpaper-generator")
+        self.logger.addHandler(handler)
+        self.logger.setLevel(logging.DEBUG if debug else logging.WARNING)
 
-    def __init__(self, **config):
-        for key, value in config:
-            setattr(self, key, value)
 
-    def get_pictures_list(self, path, authorized_extensions):
-        """Return the list of pictures in a specific directory."""
-        pictures_list = []
+    def scan(self, path, recursive=False, followlinks=False):
+        """Scan a given directory for image files."""
+        # Use absolute paths
         path = os.path.abspath(path)
-        for filename in os.listdir(path):
-            if filename.split('.')[-1] in authorized_extensions:
-                pictures_list.append(os.path.join(path, filename))
-        return pictures_list
+        
+        def process_filepath(filepath):
+            # TODO: Use MIME magic
+            mimetype = mimetypes.guess_type(filepath)[0]
+            if mimetype and mimetype.split('/')[0] == "image":
+                self.logger.debug(" * Found image file: %s", os.path.join(path, filename))
+                self.images.append(filepath)
+        
+        # Scan directory for files
+        self.logger.info("Scanning directory: %s", path)
+        if recursive:
+            for dirpath, dirnames, filenames in os.walk(path, followlinks=followlinks):
+                self.logger.debug(" * Entering directory: %s", os.path.join(path, dirpath))
+                for filename in filenames:
+                    process_filepath(os.path.join(path, dirpath, filename))
+        else:
+            for filename in os.listdir(path):
+                process_filepath(os.path.join(path, filename))
+    
+    
+    def shuffle(self):
+        """Shuffle the current list of images randomly."""
+        random.shuffle(self.images)
+    
 
-    def build_xml(self, pictures_list, display_time, transition_time):
+    def build_xml(self, display_time, transition_time):
         """Build an XML file from the list of pictures."""
 
         doc = Document()
@@ -58,11 +93,11 @@ class DynamicWallpaperGenerator(object):
         starttime.appendChild(second)
         background.appendChild(starttime)
 
-        for pic in pictures_list:
+        for i, pic in enumerate(self.images):
             try:
-                next = pictures_list[pictures_list.index(pic) + 1]
+                next = self.images[i + 1]
             except IndexError:
-                next = pictures_list[0]
+                next = self.images[0]
 
             static = doc.createElement('static')
 
@@ -96,60 +131,83 @@ class DynamicWallpaperGenerator(object):
 
 
 if __name__ == "__main__":
-
     # -- Command line params --------------------------------------------------
     parser = argparse.ArgumentParser(description="""A simple command line tool
     to generate an XML file to use for gnome wallpapers, to have dynamic
     walls""")
 
-    parser.add_argument('-p', '--path', dest='path', default='.',
-        help="""Path to look for the pictures. If no output is specified, will 
-        be used too for outputing the dynamic-wallpaper.xml file. Default value
-        is the current directory (.)""")
+    parser.add_argument('directories', metavar="directory", nargs='*',
+        help="Directory path that should be searched for image files")
+    parser.add_argument('-p', '--path', dest='path', action='store',
+        help="(Provided for compatibility)")
+
+    parser.add_argument('-r', '--randomize', dest='randomize', default=False,
+        action='store_true', help="Randomly shuffle scanned images")
+    
+    parser.add_argument('-R', '--recursive', dest='recursive', default=False,
+        action='store_true', help="Recursivly scan the given directories")
+    
+    parser.add_argument('-f', '--follow-symlinks', dest='followlinks', default=False,
+        action='store_true', help="Follow symbolic links when scanning directories recursivly (implies --recursive)")
 
     parser.add_argument('-o', '--output', dest='output', default=None,
         help="""Output filename. If no filename is specified, a
         dynamic-wallpaper.xml file will be generated in the path containing the
-        pictures. You can also use "-" to display the xml in the stdout.""")
+        pictures. You can also use "-" to display the xml in the stdout""")
 
     parser.add_argument('-t', '--transition-time', dest='transition_time',
-        default=2, help="""Time (in seconds) transitions must last
-        (default value is 2 seconds)""")
+        default=2, help="Time (in seconds) transitions must last [Default: 2]")
 
     parser.add_argument('-d', '--display-time', dest='display_time',
-        default=900, help="""Time (in seconds) a picture must be displayed.
-        Default value is 900 (15mn)""")
+        default=900, help="Time (in seconds) a picture must be displayed [Default: 900 (15min)]")
 
-    parser.add_argument('-s', '--set-background', dest='set_background', 
-        action='store_true', help="""try to set the background using
-        gnome-appearance-properties""")
+    parser.add_argument('-s', '--set-background', action="store_true", help="(Provided for compatibility)")
 
-    parser.add_argument('-b', '--debug', dest='debug', action='store_true')
+    parser.add_argument('-v', '--debug', dest='debug', action='store_true')
 
     args = parser.parse_args()
 
-    # -- Generate the XML file ------------------------------------------------
-
-    generator = DynamicWallpaperGenerator()
-    pictures = generator.get_pictures_list(args.path, _SUPPORTED_FILES)
-
-    if not pictures:
-        print 'Error: no pictures in the %s folder (looking for %s)' % (
-            args.path, ', '.join(_SUPPORTED_FILES))
-    else:
-        xml = generator.build_xml(pictures, args.display_time, 
-                                  args.transition_time)
-
-        if args.output == '-':
-            print xml
+    # -- Compatibility section -----------------------------------------------
+    
+    if args.path:
+        args.directories.append(args.path)
+        
         if not args.output:
             args.output = os.path.join(args.path, 'dynamic-wallpaper.xml')
 
-        output = os.path.abspath(args.output)
-        with open(output, 'w') as f:
-            f.write(xml)
-            print "%s generated" % output
+    # -- Generate the XML file ------------------------------------------------
 
-        # try to set the background
-        if args.set_background:
-            os.system('gnome-appearance-properties %s' % output)
+    # Initialize wallpaper generator
+    generator = DynamicWallpaperGenerator(args.debug)
+    
+    if args.followlinks:
+        args.recursive = True
+    
+    # Scan directories
+    for dirpath in args.directories:
+        generator.scan(dirpath, args.recursive, args.followlinks)
+    
+    if len(args.directories) < 1:
+        generator.scan('.', args.recursive, args.followlinks)
+    
+    # Check if any image files where found
+    if len(generator.images) < 1:
+        generator.logger.error("No pictures found in: %s", ', '.join(args.directories))
+        sys.exit(1)
+    
+    # Shuffle images
+    if args.randomize:
+        generator.shuffle()
+    
+    # Generate output path
+    if not args.output:
+        path = os.path.abspath(os.path.join(os.getcwd(), "dynamic-wallpaper.xml"))
+    elif args.path == '-':
+        path = "/dev/stdout"
+    else:
+        path = os.path.abspath(args.output)
+    
+    # Generate and write XML
+    with open(path, "w") as f:
+        f.write(generator.build_xml(args.display_time, args.transition_time))
+        print("%s generated" % path)

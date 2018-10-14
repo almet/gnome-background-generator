@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 #-*- coding: utf8 -*-
 
 # Copyright (c) 2010 Alexis Metaireau
@@ -57,6 +57,8 @@ class DynamicWallpaperGenerator(object):
         else:
             for filename in os.listdir(path):
                 process_filepath(os.path.join(path, filename))
+
+        self.images.sort()
     
     
     def shuffle(self):
@@ -111,21 +113,22 @@ class DynamicWallpaperGenerator(object):
 
             background.appendChild(static)
 
-            transition = doc.createElement('transition')
+            if transition_time:
+                transition = doc.createElement('transition')
 
-            duration = doc.createElement('duration')
-            duration.appendChild(doc.createTextNode("%s.0" % transition_time))
-            transition.appendChild(duration)
+                duration = doc.createElement('duration')
+                duration.appendChild(doc.createTextNode("%s.0" % transition_time))
+                transition.appendChild(duration)
 
-            fromel = doc.createElement('from')
-            fromel.appendChild(doc.createTextNode(pic))
-            transition.appendChild(fromel)
+                fromel = doc.createElement('from')
+                fromel.appendChild(doc.createTextNode(pic))
+                transition.appendChild(fromel)
 
-            to = doc.createElement('to')
-            to.appendChild(doc.createTextNode(next))
-            transition.appendChild(to)
+                to = doc.createElement('to')
+                to.appendChild(doc.createTextNode(next))
+                transition.appendChild(to)
 
-            background.appendChild(transition)
+                background.appendChild(transition)
 
         return doc.toxml()
 
@@ -209,5 +212,5 @@ if __name__ == "__main__":
     
     # Generate and write XML
     with open(path, "w") as f:
-        f.write(generator.build_xml(args.display_time, args.transition_time))
+        f.write(generator.build_xml(args.display_time, float(args.transition_time)))
         print("%s generated" % path)

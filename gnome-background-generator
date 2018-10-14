@@ -57,6 +57,8 @@ class DynamicWallpaperGenerator(object):
         else:
             for filename in os.listdir(path):
                 process_filepath(os.path.join(path, filename))
+
+        self.images.sort()
     
     
     def shuffle(self):

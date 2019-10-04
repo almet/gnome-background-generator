@@ -55,6 +55,34 @@ Examples
    in random order with a 5 second transition and a 15 second display time:
    ``gnome-background-generator -o background.xml -r -t 5 -d 15 -R -f foo bar``
 
+Gnome 3 Background Settings
+===========================
+
+We need to add the new dynamic-background.xml file generated above to the gnome-background-properties manifest.
+
+1. Create a new directory::
+
+   $ mkdir -p ~/.local/share/gnome-background-properties
+
+2. Add a new file in this directory named `custom.xml` with this content::
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+    <wallpapers>
+     <wallpaper deleted="false">
+       <name>Gnome Background Generator Wallpapers</name>
+       <filename>/path/to/dynamic-wallpaper.xml</filename>
+       <options>zoom</options>
+     </wallpaper>
+    </wallpapers>
+
+Next we need to reference our dynamic-background.xml file from the Gnome 3 Settings
+
+1. Open the "Activities" overview and start typing "Settings"
+2. Click on "Background"
+3. Select either the "Background" or "Lock Screen"
+4. Find your dynamic background entry and select it
+
 Changing your desktop randomly
 ==============================
 
